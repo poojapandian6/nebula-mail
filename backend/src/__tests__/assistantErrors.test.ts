@@ -11,17 +11,17 @@ function fakeApiError(status: number, message = "error"): APIError {
 }
 
 describe("classifyAssistantError", () => {
-  it("gives a clear, actionable message when XAI_API_KEY is missing", () => {
+  it("gives a clear, actionable message when GROQ_API_KEY is missing", () => {
     const { status, message } = classifyAssistantError(new AssistantNotConfiguredError());
     expect(status).toBe(503);
-    expect(message).toMatch(/XAI_API_KEY/);
+    expect(message).toMatch(/GROQ_API_KEY/);
   });
 
   it("classifies a 401/403 as an invalid-key problem, not a generic failure", () => {
     for (const code of [401, 403]) {
       const { status, message } = classifyAssistantError(fakeApiError(code));
       expect(status).toBe(502);
-      expect(message).toMatch(/XAI_API_KEY/i);
+      expect(message).toMatch(/GROQ_API_KEY/i);
     }
   });
 
@@ -44,9 +44,11 @@ describe("classifyAssistantError", () => {
   });
 
   it("classifies a network-level failure distinctly from an API error", () => {
-    const { status, message } = classifyAssistantError(new Error("fetch failed: ENOTFOUND api.x.ai"));
+    const { status, message } = classifyAssistantError(
+      new Error("fetch failed: ENOTFOUND api.groq.com")
+    );
     expect(status).toBe(502);
-    expect(message).toMatch(/reach the xAI API/i);
+    expect(message).toMatch(/reach the Groq API/i);
   });
 
   it("falls back to a generic message for anything unrecognized, without throwing", () => {

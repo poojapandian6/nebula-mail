@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { AssistantNotConfiguredError } from "./xaiClient.js";
 
-// Turns whatever the xAI call threw into a short message safe to show the
+// Turns whatever the Groq call threw
 // user in the assistant chat panel. Covers every failure mode called out
 // for this integration: missing/invalid key, rate limits, network errors,
 // and anything else falls back to a generic message (with the real detail
@@ -17,23 +17,23 @@ export function classifyAssistantError(err: unknown): { status: number; message:
       case 403:
         return {
           status: 502,
-          message: "The xAI API rejected the request — check that XAI_API_KEY in your backend .env is valid.",
+          message: "The Groq API rejected the request — check that GROQ_API_KEY in your backend .env is valid.",
         };
       case 429:
         return {
           status: 429,
-          message: "The assistant is being rate-limited by the xAI API right now — please wait a moment and try again.",
+          message: "The assistant is being rate-limited by the Groq API right now — please wait a moment and try again.",
         };
       case 400:
         return {
           status: 502,
-          message: "The xAI API rejected the request as malformed. This usually means a tool call had arguments the model formed incorrectly — try rephrasing.",
+          message: "The Groq API rejected the request as malformed. This usually means a tool call had arguments the model formed incorrectly — try rephrasing.",
         };
       default:
         if (err.status && err.status >= 500) {
-          return { status: 502, message: "The xAI API is currently unavailable — please try again shortly." };
+          return { status: 502, message: "The Groq API is currently unavailable — please try again shortly." };
         }
-        return { status: 502, message: `The xAI API returned an error: ${err.message}` };
+        return { status: 502, message: `The Groq API returned an error: ${err.message}` };
     }
   }
 
@@ -43,7 +43,7 @@ export function classifyAssistantError(err: unknown): { status: number; message:
   if (err instanceof Error && /fetch failed|ECONNREFUSED|ENOTFOUND|network/i.test(err.message)) {
     return {
       status: 502,
-      message: "Couldn't reach the xAI API — check XAI_BASE_URL and your network connection.",
+      message: "Couldn't reach the Groq API — check GROQ_BASE_URL and your network connection.",
     };
   }
 

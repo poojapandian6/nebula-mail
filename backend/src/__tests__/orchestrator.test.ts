@@ -58,6 +58,7 @@ describe("executeTool", () => {
     ];
     const gmail = {
       listEmails: vi.fn().mockResolvedValue({ emails: fakeEmails, resultSizeEstimate: 1 }),
+      countEmails: vi.fn().mockResolvedValue(1),
     } as unknown as GmailService;
 
     const { directive } = await executeTool(fakeToolCall("search_emails", { from: "Sarah" }), {
