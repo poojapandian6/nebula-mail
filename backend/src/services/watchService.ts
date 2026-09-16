@@ -1,4 +1,6 @@
 import { PubSub } from "@google-cloud/pubsub";
+import fs from "node:fs";
+import path from "node:path";
 import { prisma } from "../db/client.js";
 import { env } from "../utils/env.js";
 import { getAuthorizedClient } from "./authService.js";
@@ -16,26 +18,30 @@ import { emitToUser } from "../websocket/gateway.js";
 // that a push webhook needs — a meaningful simplification for a 5-day build
 // deployed to a Railway/Render URL. Documented as a trade-off in the README.
 let pubsub: PubSub | null = null;
+
 function getPubSub(): PubSub {
   if (!pubsub) {
-    console.log(
-      "[watch] service account credentials configured:",
-      Boolean(env.GOOGLE_SERVICE_ACCOUNT_JSON)
+    const renderCredentialsPath = "/etc/secrets/service-account.json";
+    const localCredentialsPath = path.join(
+      process.cwd(),
+      "service-account.json"
     );
 
-    const credentials = env.GOOGLE_SERVICE_ACCOUNT_JSON
-      ? JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON)
-      : undefined;
-
-    pubsub = new PubSub({
-      projectId: env.GOOGLE_CLOUD_PROJECT_ID,
-      credentials,
-    });
+    if (fs.existsSync(renderCredentialsPath)) {
+      pubsub = new PubSub({
+        projectId: env.GOOGLE_CLOUD_PROJECT_ID,
+        keyFilename: renderCredentialsPath,
+      });
+    } else {
+      pubsub = new PubSub({
+        projectId: env.GOOGLE_CLOUD_PROJECT_ID,
+        keyFilename: localCredentialsPath,
+      });
+    }
   }
 
   return pubsub;
 }
-
 export async function registerGmailWatch(userId: string) {
   if (!env.GOOGLE_PUBSUB_TOPIC) {
     console.warn("[watch] GOOGLE_PUBSUB_TOPIC not set — skipping real-time sync registration");
