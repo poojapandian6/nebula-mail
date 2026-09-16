@@ -159,20 +159,56 @@ export function scheduleWatchRenewal() {
   setInterval(renew, RENEWAL_CHECK_INTERVAL_MS);
 }
 
-async function handleGmailNotification(emailAddress: string, notifiedHistoryId: string) {
-  const user = await prisma.user.findUnique({ where: { email: emailAddress } });
-  if (!user) return;
+async function handleGmailNotification(
+  emailAddress: string,
+  notifiedHistoryId: string
+) {
+  const user = await prisma.user.findUnique({
+    where: { email: emailAddress },
+  });
+
+  if (!user) {
+    console.log(`[watch] No user found for ${emailAddress}`);
+    return;
+  }
+
+  console.log(
+    `[watch] Processing user ${user.email}, stored historyId=${user.historyId}, notified historyId=${notifiedHistoryId}`
+  );
 
   const client = await getAuthorizedClient(user.id);
   const gmail = new GmailService(client);
 
   const startHistoryId = user.historyId ?? notifiedHistoryId;
-  const { newMessageIds, latestHistoryId } = await gmail.listHistory(startHistoryId);
 
-  await prisma.user.update({ where: { id: user.id }, data: { historyId: latestHistoryId } });
+  console.log(`[watch] Calling history.list from ${startHistoryId}`);
+
+  const { newMessageIds, latestHistoryId } =
+    await gmail.listHistory(startHistoryId);
+
+  console.log(
+    `[watch] history.list returned ${newMessageIds.length} new messages:`,
+    newMessageIds
+  );
+
+  console.log(`[watch] latestHistoryId=${latestHistoryId}`);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { historyId: latestHistoryId },
+  });
 
   for (const id of newMessageIds) {
+    console.log(`[watch] Fetching new email ${id}`);
+
     const email = await gmail.getEmail(id);
+
+    console.log(
+      `[watch] Emitting NEW_EMAIL for ${email.from.email}: ${email.subject}`
+    );
+
     emitToUser(user.id, "NEW_EMAIL", { email });
+
+    console.log(`[watch] NEW_EMAIL emitted successfully`);
   }
 }
