@@ -6,6 +6,7 @@
 # would be a no-op against an empty database and the app would fail at
 # runtime with "table does not exist" errors. `prisma db push` syncs the
 # schema directly and is idempotent, so it's safe to run on every deploy.
+
 databases:
   - name: nebula-mail-db
     plan: free
@@ -20,8 +21,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 4000
       - key: FRONTEND_URL
         sync: false
       - key: SESSION_JWT_SECRET
@@ -38,12 +37,12 @@ services:
         sync: false
       - key: GOOGLE_CLOUD_PROJECT_ID
         sync: false
-      - key: XAI_API_KEY
+      - key: GROQ_API_KEY
         sync: false
-      - key: XAI_BASE_URL
-        value: https://api.x.ai/v1
-      - key: XAI_MODEL
-        value: grok-4.6
+      - key: GROQ_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b
       - key: DATABASE_URL
         fromDatabase:
           name: nebula-mail-db
