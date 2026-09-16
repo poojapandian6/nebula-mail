@@ -16,6 +16,7 @@ services:
     name: nebula-mail-backend
     runtime: node
     plan: free
+    rootDir: backend
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npx prisma db push --skip-generate && npm start
     envVars:
