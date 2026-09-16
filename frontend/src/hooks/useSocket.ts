@@ -3,7 +3,9 @@ import { io } from "socket.io-client";
 import { useAppStore } from "../store/appStore";
 import type { EmailSummary } from "../types/mail";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "";
+const API_URL =
+  import.meta.env.VITE_API_URL ??
+  "https://nebula-mail-backend-qawz.onrender.com";
 
 // Connects once the user is authenticated (the session cookie is what the
 // backend's websocket gateway authenticates against — see
@@ -14,6 +16,7 @@ export function useSocket(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return;
+
     const socket = io(API_URL, { withCredentials: true });
 
     socket.on("NEW_EMAIL", (payload: { email: EmailSummary }) => {
