@@ -20,9 +20,7 @@ The live application requires Google OAuth authentication and Gmail access.
 
 ### 1.1 🎥 Live Demo Video
 
-**[Watch the Nebula Mail Demo](YOUR_VIDEO_LINK_HERE)**
-
-> The demo video link will be added after recording.
+**[Watch the Nebula Mail Demo](https://drive.google.com/file/d/1uQvkEC-jFBhfmnCaAuSsS5QHxfZkU0TY/view?usp=sharing)**
 
 ---
 
