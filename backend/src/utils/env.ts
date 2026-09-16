@@ -26,9 +26,10 @@ export const env = {
     "http://localhost:4000/api/auth/google/callback"
   ),
 
-  GOOGLE_PUBSUB_TOPIC: process.env.GOOGLE_PUBSUB_TOPIC ?? "",
-  GOOGLE_PUBSUB_SUBSCRIPTION: process.env.GOOGLE_PUBSUB_SUBSCRIPTION ?? "",
-  GOOGLE_CLOUD_PROJECT_ID: process.env.GOOGLE_CLOUD_PROJECT_ID ?? "",
+    GOOGLE_PUBSUB_TOPIC: process.env.GOOGLE_PUBSUB_TOPIC ?? "",
+    GOOGLE_PUBSUB_SUBSCRIPTION: process.env.GOOGLE_PUBSUB_SUBSCRIPTION ?? "",
+    GOOGLE_CLOUD_PROJECT_ID: process.env.GOOGLE_CLOUD_PROJECT_ID ?? "",
+    GOOGLE_SERVICE_ACCOUNT_JSON: process.env.GOOGLE_SERVICE_ACCOUNT_JSON ?? "",
 
   // AI provider: Groq through the OpenAI-compatible Chat Completions API.
   GROQ_API_KEY: required("GROQ_API_KEY"),
