@@ -63,24 +63,63 @@ export async function registerGmailWatch(userId: string) {
 // is never carried over Pub/Sub.
 export function startGmailPushListener() {
   if (!env.GOOGLE_PUBSUB_SUBSCRIPTION) {
-    console.warn("[watch] GOOGLE_PUBSUB_SUBSCRIPTION not set — real-time sync disabled");
+    console.warn(
+      "[watch] GOOGLE_PUBSUB_SUBSCRIPTION not set — real-time sync disabled"
+    );
     return;
   }
 
-  const subscription = getPubSub().subscription(env.GOOGLE_PUBSUB_SUBSCRIPTION);
+  console.log(
+    "[watch] starting Pub/Sub listener:",
+    env.GOOGLE_PUBSUB_SUBSCRIPTION
+  );
+
+  const subscription = getPubSub().subscription(
+    env.GOOGLE_PUBSUB_SUBSCRIPTION
+  );
 
   subscription.on("message", async (message) => {
-    message.ack();
+    console.log("[watch] Pub/Sub message RECEIVED");
+
     try {
-      const payload = JSON.parse(message.data.toString()) as { emailAddress: string; historyId: string };
-      await handleGmailNotification(payload.emailAddress, String(payload.historyId));
+      const raw = message.data.toString();
+
+      console.log("[watch] Pub/Sub raw payload:", raw);
+
+      const payload = JSON.parse(raw) as {
+        emailAddress: string;
+        historyId: string;
+      };
+
+      console.log(
+        `[watch] Gmail notification for ${payload.emailAddress}, historyId=${payload.historyId}`
+      );
+
+      message.ack();
+      console.log("[watch] Pub/Sub message ACKed");
+
+      await handleGmailNotification(
+        payload.emailAddress,
+        String(payload.historyId)
+      );
+
+      console.log("[watch] Gmail notification processed successfully");
     } catch (err) {
       console.error("[watch] failed to process Pub/Sub message:", err);
     }
   });
 
-  subscription.on("error", (err) => console.error("[watch] Pub/Sub subscription error:", err));
-  console.log("[watch] listening for Gmail push notifications via Pub/Sub pull subscription");
+  subscription.on("error", (err) => {
+    console.error("[watch] Pub/Sub subscription error:", err);
+  });
+
+  subscription.on("close", () => {
+    console.warn("[watch] Pub/Sub subscription closed");
+  });
+
+  console.log(
+    "[watch] listening for Gmail push notifications via Pub/Sub pull subscription"
+  );
 }
 
 // Gmail's users.watch() registration expires after ~7 days. Rather than
