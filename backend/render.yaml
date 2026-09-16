@@ -1,0 +1,50 @@
+# Render.com blueprint for the backend. Import this repo in Render and it
+# will pick this up automatically ("New +" -> "Blueprint").
+#
+# Note on the startCommand: this project has no committed Prisma migration
+# history (see prisma/schema.prisma for why), so `prisma migrate deploy`
+# would be a no-op against an empty database and the app would fail at
+# runtime with "table does not exist" errors. `prisma db push` syncs the
+# schema directly and is idempotent, so it's safe to run on every deploy.
+databases:
+  - name: nebula-mail-db
+    plan: free
+
+services:
+  - type: web
+    name: nebula-mail-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma db push --skip-generate && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: FRONTEND_URL
+        sync: false
+      - key: SESSION_JWT_SECRET
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: GOOGLE_PUBSUB_TOPIC
+        sync: false
+      - key: GOOGLE_PUBSUB_SUBSCRIPTION
+        sync: false
+      - key: GOOGLE_CLOUD_PROJECT_ID
+        sync: false
+      - key: XAI_API_KEY
+        sync: false
+      - key: XAI_BASE_URL
+        value: https://api.x.ai/v1
+      - key: XAI_MODEL
+        value: grok-4.6
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nebula-mail-db
+          property: connectionString

@@ -1,0 +1,57 @@
+// Nebula Mail — Prisma schema
+// Deliberately minimal: the database exists only for auth/session and Gmail
+// "watch" bookkeeping. Email content, threads, and labels are never cached
+// here — Gmail is always the source of truth, fetched live through the
+// Gmail API. This keeps the app correct-by-construction (no stale copies)
+// and avoids building a second mail store we'd have to keep in sync.
+//
+// Provider: PostgreSQL, for both local dev and production. A free hosted
+// instance (Neon, Supabase) takes under a minute to create and works
+// identically in both environments, so there's no dev/prod DB divergence
+// to reason about — see README "Local development" for the exact steps.
+//
+// Schema sync: this project uses `prisma db push` rather than
+// `prisma migrate dev/deploy`. There is no committed migration history —
+// generating one requires downloading Prisma's engine binaries, which this
+// environment's network egress doesn't allow, and for a single-environment,
+// single-schema 5-day build, migration history isn't pulling its weight
+// over just pushing the schema directly. `db push` is idempotent and safe
+// to run on every deploy. If this project grows into something with
+// multiple contributors or environments to keep in sync, switching to
+// `prisma migrate dev` to generate real migration files is the natural
+// next step.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  googleSub     String   @unique
+  accessToken   String
+  refreshToken  String
+  tokenExpiry   DateTime
+  historyId     String? // last known Gmail historyId, used to resolve Pub/Sub deltas
+  watchExpiry   DateTime? // when the current users.watch() registration expires
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  conversations AssistantConversation[]
+}
+
+// One row per assistant chat session, so multi-turn context ("reply to
+// this", "now only unread ones") survives a page refresh.
+model AssistantConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  messages  String // JSON-encoded array of {role, content, toolCalls?}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
