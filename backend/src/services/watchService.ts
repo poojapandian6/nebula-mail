@@ -15,10 +15,24 @@ import { emitToUser } from "../websocket/gateway.js";
 // queue that Gmail pushes into), but it avoids the domain-verification step
 // that a push webhook needs — a meaningful simplification for a 5-day build
 // deployed to a Railway/Render URL. Documented as a trade-off in the README.
-
 let pubsub: PubSub | null = null;
 function getPubSub(): PubSub {
-  if (!pubsub) pubsub = new PubSub({ projectId: env.GOOGLE_CLOUD_PROJECT_ID });
+  if (!pubsub) {
+    console.log(
+      "[watch] service account credentials configured:",
+      Boolean(env.GOOGLE_SERVICE_ACCOUNT_JSON)
+    );
+
+    const credentials = env.GOOGLE_SERVICE_ACCOUNT_JSON
+      ? JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON)
+      : undefined;
+
+    pubsub = new PubSub({
+      projectId: env.GOOGLE_CLOUD_PROJECT_ID,
+      credentials,
+    });
+  }
+
   return pubsub;
 }
 
