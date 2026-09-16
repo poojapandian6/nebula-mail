@@ -22,7 +22,7 @@ The live application requires Google OAuth authentication and Gmail access.
 
 **[Watch the Nebula Mail Demo](YOUR_VIDEO_LINK_HERE)**
 
-> The demo video will be added here after recording.
+> The demo video link will be added after recording.
 
 ---
 
@@ -423,6 +423,12 @@ The backend uses the Gmail History API to determine what changed and then retrie
 
 The frontend receives the new email through a WebSocket event and updates the inbox immediately.
 
+Watch Renewal
+
+Gmail watch registrations expire after a limited period.
+
+The backend automatically checks watch expiry and renews the Gmail watch before it expires.
+
 📬 Mailbox Views
 
 The application supports:
@@ -535,9 +541,9 @@ Example:
 
 Trash and Delete Management
 
-The application provides a dedicated Trash mailbox.
+The application provides a dedicated Trash mailbox and delete/trash management.
 
-Users can move/delete emails and view the Trash mailbox.
+Users can move emails to Trash and view the Trash mailbox.
 
 The assistant can also navigate to Trash.
 
@@ -559,7 +565,7 @@ Mailbox and Search Result Counts
 
 The application displays counts for mailbox views.
 
-Search/filter results also display the number of matching messages.
+Search and filter results also display the number of matching messages.
 
 This allows users to see the size of the current result set directly in the UI.
 
@@ -833,10 +839,10 @@ npm run build
 The production TypeScript and Vite build completes successfully.
 
 Current Test Summary
-Backend tests:        37 / 37 ✅
-Frontend tests:       10 / 10 ✅
-Total automated tests: 47 / 47 ✅
-Production build:      ✅
+Backend tests:          37 / 37 ✅
+Frontend tests:         10 / 10 ✅
+Total automated tests:  47 / 47 ✅
+Production build:       ✅
 🎥 Demo Flow
 
 The recommended demonstration sequence is:
@@ -962,7 +968,7 @@ In-Process Watch Renewal
 
 Watch renewal is handled inside the backend process.
 
-For a larger multi-instance production system, this could be moved into a dedicated scheduled worker.
+For a larger multi-instance system, this could be moved into a dedicated scheduled worker.
 
 🔮 Known Limitations / Future Improvements
 
@@ -999,15 +1005,9 @@ Visible UI Update
 
 In addition to the required functionality, the project includes the bonus features specified in the hiring task and a separate set of additional features implemented beyond the stated task scope.
 
-🔗 Links
-Live Application
+🔗 Repository
 
-👉 https://nebula-mail-8mja.onrender.com
-
-Demo Video
-
-🎥 Watch the Nebula Mail Demo
-
-GitHub Repository
-
+GitHub:
 https://github.com/poojapandian6/nebula-mail
+
+Built for the Nebula KnowLab hiring task.
