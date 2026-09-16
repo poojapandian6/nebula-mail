@@ -85,9 +85,14 @@ export const assistantTools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     function: {
       name: "search_emails",
       description:
-        "Search for emails matching criteria and display the results in the main UI as a result list " +
-        "(not just described in chat). Use for one-off lookups like 'find the email from Sarah about the project " +
-        "update' or 'emails from the last 10 days'.",
+        "Search for emails and display the results in the main UI. " +
+        "Use this for one-off searches AND for navigating to a specific mailbox. " +
+        "For Favorites/Starred use label STARRED. " +
+        "For Trash use label TRASH. " +
+        "For Spam/Junk use label SPAM. " +
+        "For Sent use label SENT. " +
+        "For Drafts use label DRAFTS. " +
+        "Do NOT use apply_filter for these mailbox navigation requests.",
       parameters: {
         type: "object",
         properties: {
@@ -125,9 +130,11 @@ export const assistantTools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     function: {
       name: "apply_filter",
       description:
-        "Apply a persistent filter to the Inbox view itself (updates the filter controls and the list shown), as " +
-        "opposed to search_emails which shows a one-off result set. Use for requests like 'show only unread emails " +
-        "from this week'.",
+        "Apply a persistent filter to the Inbox view itself. " +
+        "ONLY use this for filtering the Inbox, such as 'show only unread emails' " +
+        "or 'show emails from Sarah this week'. " +
+        "Do NOT use this for navigating to Starred/Favorites, Trash, Spam, Sent, or Drafts. " +
+        "For those mailboxes, use search_emails with the appropriate label.",
       parameters: {
         type: "object",
         properties: {

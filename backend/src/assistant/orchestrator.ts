@@ -70,7 +70,7 @@ function systemPrompt(context: UIContext): string {
     "Treat favorite, favorites, starred, or favorite emails as Gmail STARRED.",
     "Treat trash, deleted emails, deleted mail, or bin as Gmail TRASH.",
     "Treat spam, spam emails, junk mail, or junk emails as Gmail SPAM.",
-    "",
+    "When the user asks to show, view, or navigate to a mailbox such as favorites, starred, trash, spam, sent, or drafts, preserve that mailbox label in the tool call. Never silently change these requests to INBOX.",
     "7. DATE RANGES:",
     "For vague date ranges such as 'last 10 days', use afterDaysAgo: 10.",
     "",
